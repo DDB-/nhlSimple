@@ -1,25 +1,21 @@
-package Utils;
+package htmlUtils;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.imageio.ImageIO;
-
 import org.htmlparser.Parser;
 import org.htmlparser.filters.NodeClassFilter;
 import org.htmlparser.tags.ImageTag;
+import org.htmlparser.tags.TableTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
-public class HtmlUtils {
-	
-	public static final String IMG_REGEX_IN_URL = "/photos/mugs/";
-	public static final String IMG_DIR			= "imgs/mugs/";
+public class HtmlExtractor {
 
+	public static final String IMG_REGEX_IN_URL = "/photos/mugs/";
+	
 	/**
 	 * Gets the HTML content of the specified URL string
 	 * @param address - URL address in String form
@@ -76,19 +72,19 @@ public class HtmlUtils {
 		return null;
 	}
 	
-	/**
-	 * Given an image URL it will down
-	 * @param imgLink
-	 */
-	public static void downloadMugshot(String imgLink) {
-		BufferedImage img = null;
+	public static void extractPlayerInfo(String htmlBody) {
 		try {
-			img = ImageIO.read(new URL(imgLink));
-			File outImg = new File(IMG_DIR, "steven-stamkos.jpg");
-			outImg.createNewFile();
-			ImageIO.write(img, "jpg", outImg);
+			Parser parser = new Parser();
+			parser.setInputHTML(htmlBody);
+			NodeList tableList = parser.extractAllNodesThatMatch(new NodeClassFilter(TableTag.class));
+			
+			for(int i = 0; i < tableList.size(); i++) {
+				TableTag ex = (TableTag)tableList.elementAt(i);
+				System.out.println(ex.getStringText() +"\n\n");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
+		
 	}
 }
